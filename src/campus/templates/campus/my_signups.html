@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>我的报名 | 校园生活</title>
+    <link href="https://cdn.staticfile.net/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/campus/clubs/">校园生活</a>
+        <div class="navbar-nav">
+            <a class="nav-link" href="/campus/clubs/">社团</a>
+            <a class="nav-link" href="/campus/activities/">活动</a>
+            <a class="nav-link active" href="/campus/my-signups/">我的报名</a>
+        </div>
+        <div class="navbar-nav ms-auto">
+            {% if user.is_authenticated %}
+                <span class="navbar-text text-white me-3">{{ user.username }}</span>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">我的报名</h2>
+
+    {% if messages %}
+        {% for msg in messages %}
+        <div class="alert alert-{{ msg.tags }} alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if signups %}
+    <div class="list-group mb-4">
+        {% for s in signups %}
+        <div class="list-group-item">
+            <div class="d-flex w-100 justify-content-between align-items-start">
+                <div>
+                    <h5 class="mb-1">
+                        <a href="/campus/activity/{{ s.activity.id }}/" class="text-decoration-none">
+                            {{ s.activity.title }}
+                        </a>
+                    </h5>
+                    <small class="text-muted">
+                        社团：{{ s.activity.club.name }}
+                        ｜ 地点：{{ s.activity.location }}
+                        ｜ 开始：{{ s.activity.start_time|date:"Y-m-d H:i" }}
+                    </small>
+                    <p class="mb-1 mt-2">
+                        报名状态：
+                        {% if s.status == 'approved' %}
+                            <span class="badge bg-success">已通过</span>
+                        {% elif s.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">待审核</span>
+                        {% else %}
+                            <span class="badge bg-secondary">已取消</span>
+                        {% endif %}
+                        <small class="text-muted ms-2">
+                            报名时间：{{ s.created_at|date:"Y-m-d H:i" }}
+                        </small>
+                    </p>
+                </div>
+
+                <form method="post"
+                      action="/campus/signup/{{ s.id }}/cancel/"
+                      onsubmit="return confirm('确定取消报名「{{ s.activity.title }}」吗？');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger">取消报名</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        你还没有报名任何活动。
+        <a href="/campus/activities/" class="alert-link">去看看有什么活动</a>
+    </div>
+    {% endif %}
+
+    <a href="/campus/activities/" class="btn btn-outline-secondary">← 返回活动列表</a>
+
+</div>
+
+<script src="https://cdn.staticfile.net/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

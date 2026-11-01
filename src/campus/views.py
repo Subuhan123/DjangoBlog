@@ -61,3 +61,30 @@ def activity_signup(request, pk):
     )
     messages.success(request, '报名成功')
     return redirect('campus:activity_detail', pk=pk)
+
+
+@login_required
+def my_signups(request):
+    """我的报名列表"""
+    signups = (
+        Signup.objects
+        .filter(user=request.user)
+        .select_related('activity', 'activity__club')
+        .order_by('-created_at')
+    )
+    return render(request, 'campus/my_signups.html', {'signups': signups})
+
+
+@login_required
+def signup_cancel(request, pk):
+    """取消报名"""
+    signup = get_object_or_404(Signup, pk=pk, user=request.user)
+
+    if request.method != 'POST':
+        return redirect('campus:my_signups')
+
+    activity_title = signup.activity.title
+    signup.delete()
+    messages.success(request, f'已取消报名：{activity_title}')
+    return redirect('campus:my_signups')
+
