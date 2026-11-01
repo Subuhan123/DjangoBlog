@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>活动列表 | 校园生活</title>
+    <link href="https://cdn.staticfile.net/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/campus/clubs/">校园生活</a>
+        <div class="navbar-nav">
+            <a class="nav-link" href="/campus/clubs/">社团</a>
+            <a class="nav-link active" href="/campus/activities/">活动</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h2 class="mb-4">近期活动</h2>
+
+    <div class="list-group">
+        {% for a in activities %}
+        <a href="/campus/activity/{{ a.id }}/"
+           class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ a.title }}</h5>
+                <small>{{ a.start_time|date:"m-d H:i" }}</small>
+            </div>
+            <p class="mb-1 text-muted">{{ a.description|truncatechars:50 }}</p>
+            <small>
+                社团：{{ a.club.name }} ｜
+                地点：{{ a.location }} ｜
+                已报名：{{ a.approved_count }}/{{ a.capacity }}
+            </small>
+        </a>
+        {% empty %}
+            <p class="text-muted">暂无活动</p>
+        {% endfor %}
+    </div>
+</div>
+</body>
+</html>

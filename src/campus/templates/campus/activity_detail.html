@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ activity.title }}</title>
+    <link href="https://cdn.staticfile.net/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/campus/clubs/">校园生活</a>
+        <div class="navbar-nav">
+            <a class="nav-link" href="/campus/clubs/">社团</a>
+            <a class="nav-link" href="/campus/activities/">活动</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <a href="/campus/activities/" class="btn btn-sm btn-outline-secondary mb-3">← 返回列表</a>
+
+    <h2>{{ activity.title }}</h2>
+    <p class="text-muted">主办社团：{{ activity.club.name }}</p>
+
+    <table class="table table-bordered w-50">
+        <tr><th style="width:120px">活动地点</th><td>{{ activity.location }}</td></tr>
+        <tr><th>开始时间</th><td>{{ activity.start_time|date:"Y-m-d H:i" }}</td></tr>
+        <tr><th>结束时间</th><td>{{ activity.end_time|date:"Y-m-d H:i" }}</td></tr>
+        <tr><th>报名截止</th><td>{{ activity.signup_deadline|date:"Y-m-d H:i" }}</td></tr>
+        <tr><th>人数</th><td>{{ activity.approved_count }} / {{ activity.capacity }}</td></tr>
+        <tr><th>状态</th><td>{{ activity.get_status_display }}</td></tr>
+    </table>
+    {# ===== 消息提示 ===== #}
+    {% if messages %}
+        {% for msg in messages %}
+        <div class="alert alert-{{ msg.tags }} alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    {# ===== 报名按钮区 ===== #}
+    <div class="my-3">
+        {% if user.is_authenticated %}
+            {% if user in activity.signups.all.0.user %}
+                {# 占位，下面用更准确的写法 #}
+            {% endif %}
+
+            <form method="post" action="{% url 'campus:activity_signup' activity.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">立即报名</button>
+            </form>
+        {% else %}
+            <a href="/admin/login/?next=/campus/activity/{{ activity.id }}/"
+               class="btn btn-outline-primary">登录后报名</a>
+        {% endif %}
+    </div>
+
+    <h5 class="mt-4">活动详情</h5>
+    <p>{{ activity.description|linebreaks }}</p>
+
+    <h5 class="mt-4">报名名单（{{ signups|length }} 人）</h5>
+    {% if signups %}
+    <ul class="list-group w-50">
+        {% for s in signups %}
+        <li class="list-group-item d-flex justify-content-between">
+            <span>{{ s.user.username }}</span>
+            <span class="badge bg-info">{{ s.get_status_display }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p class="text-muted">还没有人报名</p>
+    {% endif %}
+</div>
+</body>
+</html>

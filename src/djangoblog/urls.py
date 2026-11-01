@@ -56,6 +56,7 @@ def health_check(request):
 urlpatterns = [
     path('i18n/', include('django.conf.urls.i18n')),
     path('health/', health_check, name='health_check'),
+    path('campus/', include('campus.urls')),
 ]
 urlpatterns += i18n_patterns(
     re_path(r'^admin/', admin_site.urls),
@@ -70,8 +71,8 @@ urlpatterns += i18n_patterns(
     re_path(r'^rss/$', DjangoBlogFeed()),
     re_path('^search', search_view_factory(view_class=EsSearchView, form_class=ElasticSearchModelSearchForm),
             name='search'),
-    re_path(r'', include('servermanager.urls', namespace='servermanager'))
-    , prefix_default_language=False) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    #re_path(r'', include('servermanager.urls', namespace='servermanager'))
+    prefix_default_language=False) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
